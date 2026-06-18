@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="theme-color" content="#4a3060" />
+<meta name="theme-color" content="#2E4A7A" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Calm AM" />
@@ -10,13 +10,13 @@
 <link rel="manifest" href="data:application/json,{
   &quot;name&quot;: &quot;Calm AM&quot;,
   &quot;short_name&quot;: &quot;Calm AM&quot;,
-  &quot;description&quot;: &quot;Your anger. Your patterns. Your peace.&quot;,
+  &quot;description&quot;: &quot;Recognize. Regulate. Recover.&quot;,
   &quot;start_url&quot;: &quot;.&quot;,
   &quot;display&quot;: &quot;standalone&quot;,
-  &quot;background_color&quot;: &quot;#fdf6f0&quot;,
-  &quot;theme_color&quot;: &quot;#4a3060&quot;,
+  &quot;background_color&quot;: &quot;#F5F0E8&quot;,
+  &quot;theme_color&quot;: &quot;#2E4A7A&quot;,
   &quot;icons&quot;: [{
-    &quot;src&quot;: &quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234a3060'/><text y='.9em' font-size='80' x='10'>🌿</text></svg>&quot;,
+    &quot;src&quot;: &quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232E4A7A'/><text y='.9em' font-size='80' x='10'>🌿</text></svg>&quot;,
     &quot;sizes&quot;: &quot;any&quot;,
     &quot;type&quot;: &quot;image/svg+xml&quot;
   }]
@@ -26,15 +26,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: linear-gradient(135deg, #fdf6f0 0%, #f0edf8 50%, #edf5f0 100%); min-height: 100vh; font-family: Georgia, 'Times New Roman', serif; }
-  textarea { outline: none; }
+  body { background: #F5F0E8; min-height: 100vh; font-family: 'Inter', sans-serif; color: #1A2E4A; }
+  textarea { outline: none; font-family: 'Inter', sans-serif; }
   select { outline: none; }
   button:focus { outline: none; }
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f1f1; }
-  ::-webkit-scrollbar-thumb { background: #c0b0d0; border-radius: 3px; }
+  ::-webkit-scrollbar-track { background: #EDE8DE; }
+  ::-webkit-scrollbar-thumb { background: #B8A898; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -45,10 +48,10 @@ const { useState, useEffect } = React;
 
 const RAGE_TYPES = [
   { value: "survival",    label: "Survival",    descriptor: "Threatened" },
-  { value: "abandonment", label: "Abandonment", descriptor: "Losing someone" },
-  { value: "impotent",    label: "Impotent",    descriptor: "Powerless" },
-  { value: "shame",       label: "Shame",       descriptor: "Disrespected" },
-  { value: "seething",    label: "Seething",    descriptor: "Slow burn" },
+  { value: "abandonment", label: "Attachment",  descriptor: "Losing someone" },
+  { value: "impotent",    label: "Powerlessness", descriptor: "Powerless" },
+  { value: "shame",       label: "Dignity",     descriptor: "Disrespected" },
+  { value: "seething",    label: "Grievance",   descriptor: "Slow burn" },
 ];
 
 const FEELINGS = [
@@ -86,17 +89,17 @@ const EXPRESSIONS = [
 const MOODS = ["Calm","Relieved","Ashamed","Regretful","Still Frustrated","Sad","Proud","Anxious","Grateful"];
 
 const ANGER_EXPLANATIONS = [
-  { type: "Survival Rage", color: "#e07b54", summary: "You feel physically threatened or unsafe.", text: "Your anger is often explosive and primal. It's triggered when your physical safety or existence feels under threat. It's the rage beneath fight-or-flight. It can show up in dramatic situations like a car nearly hitting you, feeling cornered or trapped, and even in bigger moments like domestic violence. Your body tends to react before the thought forms. (It is precognitive)" },
-  { type: "Abandonment Rage", color: "#7b8ce0", summary: "You feel like someone important was leaving you.", text: "It fires when someone important feels like they're leaving, pulling away, or choosing something else over you. It's literal separation or emotional withdrawal. Your rage is often a mask over profound fear. Some people find this type of rage to be a frequent visitor. At its root it protects your relationships with others." },
-  { type: "Impotent Rage", color: "#54a87b", summary: "You feel powerless, like nothing you do would change anything.", text: "The anger of powerlessness happens when you want to change something but can't. When you're being overruled, ignored, or steamrolled with no effective recourse. It tends to turn inward as much as outward, which is why it's often accompanied by shame or despair. It's corrosive over time precisely because the situation that triggers it often doesn't change." },
-  { type: "Shame Rage", color: "#c06090", summary: "You feel disrespected, humiliated, or made to feel small.", text: "It fires when your dignity feels violated, like being mocked, dismissed, disrespected, or publicly humiliated. Sometimes it's called humiliation rage. Your anger is a defense of the self: You don't get to make me small. You aren't responding to the slight itself. You're responding to what it means about your self worth. In adolescents especially, this is enormously powerful." },
-  { type: "Seething Rage", color: "#8b4040", summary: "Anger that builds up slowly over time until it can't stay inside.", text: "The slow burn accumulates quietly over time rather than erupting in the moment. You construct a story: I have been wronged, overlooked, pushed out, made irrelevant, and that story hardens into grievance. The acute danger is that it doesn't fade away: it builds. It's the rage that looks like calm from the outside until it isn't. This can be the most dangerous type and is commonly seen in cases of prolonged isolation and marginalization." },
+  { type: "Survival Impulse", color: "#e07b54", summary: "You feel physically threatened or unsafe.", text: "This response is often explosive and primal. It's triggered when your physical safety or existence feels under threat — the activation beneath fight-or-flight. It can show up in dramatic situations like a car nearly hitting you, feeling cornered or trapped, or moments of physical danger. Your body tends to react before the thought forms. (It is precognitive)" },
+  { type: "Attachment Impulse", color: "#7b8ce0", summary: "You feel like someone important is pulling away.", text: "This pattern appears when someone important feels like they're leaving, withdrawing, or choosing something else over you, whether through literal separation or emotional distance. The intense feeling is often a mask over profound fear. Some people find this pattern to be a frequent visitor. At its root it protects your connections with others." },
+  { type: "Powerlessness Impulse", color: "#54a87b", summary: "You feel powerless, like nothing you do will change anything.", text: "This response occurs when you want to change something but can't. When you're being overruled, ignored, or steamrolled with no effective recourse. It tends to turn inward as much as outward, which is why it's often accompanied by shame or despair. It's corrosive over time precisely because the situation that triggers it often doesn't change." },
+  { type: "Dignity Impulse", color: "#c06090", summary: "You feel disrespected, humiliated, or made to feel small.", text: "This pattern fires when your dignity feels violated. Being mocked, dismissed, disrespected, or publicly humiliated. Sometimes called the Humiliation Impulse. Your activation is a defense of the self: You don't get to make me small. You aren't responding to the slight itself. You're responding to what it means about your self-worth. In adolescents especially, this is enormously powerful." },
+  { type: "Grievance Impulse", color: "#8b4040", summary: "Activation that builds slowly over time until it can't stay inside.", text: "This slow-burn pattern accumulates quietly over time rather than erupting in the moment. You construct a story: I have been wronged, overlooked, pushed out, made irrelevant, and that story hardens into grievance. The acute danger is that it doesn't fade: it builds. It's the pattern that looks like calm from the outside until it isn't. This can be the most significant type and is commonly seen in cases of prolonged isolation and marginalization." },
 ];
 
 const ANGER_LEVELS = [1,2,3,4,5];
 const angerColor = (n) => ["","#7ab87a","#e0c84a","#e0883a","#c03030","#7a1040"][n] || "#ccc";
 const angerDark  = (n) => ["","#3a6e3a","#7a6a00","#7a3a00","#7a0000","#3a0020"][n] || "#999";
-const angerLabel = (n) => ["","Mild irritation","Noticeable frustration","Significant anger","Intense anger","Explosive / overwhelming"][n] || "";
+const angerLabel = (n) => ["","Mild irritation","Noticeable frustration","Significant activation","Intense activation","Overwhelming activation"][n] || "";
 
 function formatDate(d) {
   return new Date(d).toLocaleString("en-CA", { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
@@ -115,17 +118,17 @@ const STORAGE_KEY = "anger-journal-v4";
 function loadEntries() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; } }
 function saveEntries(e) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(e)); } catch {} }
 
-const cardStyle = { background:"#fff", borderRadius:14, padding:"16px 18px", marginBottom:14, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", border:"1px solid #f0eaf8" };
-const textareaStyle = { width:"100%", padding:"10px 12px", marginTop:8, borderRadius:8, border:"1px solid #e0d8f0", fontFamily:"Georgia,serif", fontSize:14, color:"#444", background:"#faf9ff", resize:"vertical", lineHeight:1.6 };
+const cardStyle = { background:"#FDFAF5", borderRadius:14, padding:"16px 18px", marginBottom:14, boxShadow:"0 2px 12px rgba(46,74,122,0.08)", border:"1px solid #DDD5C4" };
+const textareaStyle = { width:"100%", padding:"10px 12px", marginTop:8, borderRadius:8, border:"1px solid #DDD5C4", fontFamily:"'Inter',sans-serif", fontSize:14, color:"#1A2E4A", background:"#F5F0E8", resize:"vertical", lineHeight:1.6 };
 
 function Label({ children }) {
-  return <div style={{ fontSize:13, fontWeight:"bold", color:"#4a3060", letterSpacing:"0.04em", textTransform:"uppercase" }}>{children}</div>;
+  return <div style={{ fontSize:13, fontWeight:"600", color:"#2E4A7A", letterSpacing:"0.04em", textTransform:"uppercase" }}>{children}</div>;
 }
 function Hint({ children }) {
-  return <div style={{ fontSize:12, color:"#aaa", marginTop:2, fontStyle:"italic" }}>{children}</div>;
+  return <div style={{ fontSize:12, color:"#7A8FA8", marginTop:2, fontStyle:"italic" }}>{children}</div>;
 }
 function SectionDivider({ label }) {
-  return <div style={{ fontSize:11, color:"#bbb", textTransform:"uppercase", letterSpacing:"0.1em", marginTop:16, marginBottom:4 }}>{label}</div>;
+  return <div style={{ fontSize:11, color:"#B8A898", textTransform:"uppercase", letterSpacing:"0.1em", marginTop:16, marginBottom:4 }}>{label}</div>;
 }
 
 function ToggleButtons({ items, selected, onToggle }) {
@@ -134,8 +137,8 @@ function ToggleButtons({ items, selected, onToggle }) {
       {items.map(item => {
         const label  = typeof item === "string" ? item : item.label;
         const isStr  = typeof item === "string";
-        const base   = isStr ? "#4a3060" : item.color;
-        const dark   = isStr ? "#2a1040" : item.dark;
+        const base   = isStr ? "#2E4A7A" : item.color;
+        const dark   = isStr ? "#1A2E4A" : item.dark;
         const active = selected.includes(label);
         return (
           <button key={label} onClick={() => onToggle(label)} style={{
@@ -143,7 +146,7 @@ function ToggleButtons({ items, selected, onToggle }) {
             border: active ? `2.5px solid ${dark}` : `1.5px solid ${base}88`,
             background: active ? base : base+"22",
             color: active ? "#fff" : dark,
-            fontSize:13, cursor:"pointer", fontFamily:"Georgia,serif",
+            fontSize:13, cursor:"pointer", fontFamily:"'Inter',sans-serif",
             fontWeight: active ? "bold" : "normal",
             transition:"all 0.2s",
             boxShadow: active ? `0 2px 8px ${base}70` : "none"
@@ -155,9 +158,11 @@ function ToggleButtons({ items, selected, onToggle }) {
 }
 
 // ── INSIGHTS ──
-function Insights({ entries }) {
+function Insights({ entries, onClearAll }) {
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
   if (entries.length < 2) {
-    return <div style={{ paddingTop:60, textAlign:"center", color:"#aaa", fontStyle:"italic" }}>Add a few more entries to start seeing patterns.</div>;
+    return <div style={{ paddingTop:60, textAlign:"center", color:"#7A8FA8", fontStyle:"italic" }}>Add a few more entries to start seeing patterns.</div>;
   }
 
   const levelCounts = [1,2,3,4,5].map(n => ({ level:n, count:entries.filter(e => e.angerLevel===n).length }));
@@ -190,37 +195,37 @@ function Insights({ entries }) {
     .map(([rage, em]) => { const top = Object.entries(em).sort((a,b)=>b[1]-a[1])[0]; return top ? { rage:rageLabel(rage), expression:top[0] } : null; })
     .filter(Boolean);
 
-  const SH = ({ t }) => <div style={{ fontSize:15, fontWeight:"bold", color:"#4a3060", margin:"24px 0 10px", borderBottom:"1px solid #f0eaf8", paddingBottom:6 }}>{t}</div>;
-  const pill = (text, bg, fg) => <span style={{ padding:"4px 12px", background:bg, borderRadius:12, fontSize:13, color:fg, fontWeight:"bold" }}>{text}</span>;
+  const SH = ({ t }) => <div style={{ fontSize:15, fontWeight:"600", color:"#2E4A7A", margin:"24px 0 10px", borderBottom:"1px solid #DDD5C4", paddingBottom:6 }}>{t}</div>;
+  const pill = (text, bg, fg) => <span style={{ padding:"4px 12px", background:bg, borderRadius:12, fontSize:13, color:fg, fontWeight:"600" }}>{text}</span>;
 
   return (
     <div style={{ paddingTop:24 }}>
-      <h2 style={{ fontWeight:"normal", color:"#4a3060", fontSize:22, marginBottom:4, textAlign:"center" }}>Insights</h2>
-      <p style={{ textAlign:"center", color:"#999", fontSize:13, marginBottom:8, fontStyle:"italic" }}>Based on {entries.length} {entries.length===1?"entry":"entries"}</p>
+      <h2 style={{ fontWeight:"600", color:"#2E4A7A", fontSize:22, marginBottom:4, textAlign:"center" }}>Insights</h2>
+      <p style={{ textAlign:"center", color:"#7A8FA8", fontSize:13, marginBottom:8, fontStyle:"italic" }}>Based on {entries.length} {entries.length===1?"entry":"entries"}</p>
 
-      <SH t="Anger Level Distribution" />
+      <SH t="Activation Level Distribution" />
       <div style={cardStyle}>
         {levelCounts.map(({ level, count }) => (
           <div key={level} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
             <div style={{ width:28, height:28, borderRadius:"50%", background:angerColor(level), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:"bold", fontSize:13, flexShrink:0 }}>{level}</div>
-            <div style={{ flex:1, background:"#f5f0fa", borderRadius:6, height:22, overflow:"hidden" }}>
+            <div style={{ flex:1, background:"#EDE8DE", borderRadius:6, height:22, overflow:"hidden" }}>
               <div style={{ width:`${(count/maxCount)*100}%`, background:angerColor(level), height:"100%", borderRadius:6, minWidth:count>0?6:0 }} />
             </div>
-            <div style={{ width:24, textAlign:"right", fontSize:13, color:"#888" }}>{count}</div>
+            <div style={{ width:24, textAlign:"right", fontSize:13, color:"#7A8FA8" }}>{count}</div>
           </div>
         ))}
       </div>
 
       {rageRanked.length > 0 && <>
-        <SH t="Most Frequent Rage Types" />
+        <SH t="Most Frequent Stress Response Patterns" />
         <div style={cardStyle}>
           {rageRanked.map(([value, count]) => (
             <div key={value} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-              <div style={{ width:110, fontSize:13, color:"#555", flexShrink:0 }}>{rageLabel(value)}</div>
-              <div style={{ flex:1, background:"#f5f0fa", borderRadius:6, height:22, overflow:"hidden" }}>
-                <div style={{ width:`${(count/rageMax)*100}%`, background:"#7b6090", height:"100%", borderRadius:6, minWidth:count>0?6:0 }} />
+              <div style={{ width:110, fontSize:13, color:"#1A2E4A", flexShrink:0 }}>{rageLabel(value)}</div>
+              <div style={{ flex:1, background:"#EDE8DE", borderRadius:6, height:22, overflow:"hidden" }}>
+                <div style={{ width:`${(count/rageMax)*100}%`, background:"#4A6FA5", height:"100%", borderRadius:6, minWidth:count>0?6:0 }} />
               </div>
-              <div style={{ width:24, textAlign:"right", fontSize:13, color:"#888" }}>{count}</div>
+              <div style={{ width:24, textAlign:"right", fontSize:13, color:"#7A8FA8" }}>{count}</div>
             </div>
           ))}
         </div>
@@ -231,26 +236,57 @@ function Insights({ entries }) {
         <div style={cardStyle}>
           {feelingInsights.map(({ feeling, expression }) => (
             <div key={feeling} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
-              {pill(feeling, "#f0eaf8", "#4a3060")}
-              <span style={{ color:"#bbb" }}>→</span>
-              {pill(expression, "#fff0e8", "#804020")}
+              {pill(feeling, "#DDE6F0", "#2E4A7A")}
+              <span style={{ color:"#B8A898" }}>→</span>
+              {pill(expression, "#EDE8DE", "#5A3A1A")}
             </div>
           ))}
         </div>
       </>}
 
       {rageExprInsights.length > 0 && <>
-        <SH t="Rage type → most common reaction" />
+        <SH t="SRP → most common reaction" />
         <div style={{ ...cardStyle, marginBottom:32 }}>
           {rageExprInsights.map(({ rage, expression }) => (
             <div key={rage} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
-              {pill(rage, "#f0eaf8", "#4a3060")}
-              <span style={{ color:"#bbb" }}>→</span>
-              {pill(expression, "#fff0e8", "#804020")}
+              {pill(rage, "#DDE6F0", "#2E4A7A")}
+              <span style={{ color:"#B8A898" }}>→</span>
+              {pill(expression, "#EDE8DE", "#5A3A1A")}
             </div>
           ))}
         </div>
       </>}
+
+      {/* Clear Entries */}
+      <div style={{ marginTop:32, marginBottom:32, borderTop:"1px solid #DDD5C4", paddingTop:24 }}>
+        {!showConfirm ? (
+          <button onClick={() => setShowConfirm(true)} style={{
+            width:"100%", padding:"11px 16px", borderRadius:12,
+            border:"1px solid #DDD5C4", background:"transparent",
+            color:"#B8A898", fontSize:13, cursor:"pointer",
+            fontFamily:"'Inter',sans-serif", transition:"all 0.2s"
+          }}>Clear all entries…</button>
+        ) : (
+          <div style={{ background:"#FDFAF5", borderRadius:14, padding:"18px", border:"2px solid #c03030" }}>
+            <div style={{ fontSize:15, fontWeight:"600", color:"#7a0000", marginBottom:8 }}>Permanently delete all {entries.length} entries?</div>
+            <p style={{ fontSize:13, color:"#1A2E4A", lineHeight:1.6, marginBottom:16 }}>This cannot be undone. Your entire journal history will be erased.</p>
+            <div style={{ display:"flex", gap:10 }}>
+              <button onClick={() => setShowConfirm(false)} style={{
+                flex:1, padding:"10px", borderRadius:10,
+                border:"1.5px solid #DDD5C4", background:"#F5F0E8",
+                color:"#2E4A7A", fontSize:13, fontWeight:"600",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif"
+              }}>Cancel</button>
+              <button onClick={() => { onClearAll(); setShowConfirm(false); }} style={{
+                flex:1, padding:"10px", borderRadius:10,
+                border:"none", background:"#c03030",
+                color:"#fff", fontSize:13, fontWeight:"600",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif"
+              }}>Yes, delete everything</button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -287,7 +323,7 @@ function AddInfo({ entries, onUpdate, onDelete }) {
   };
 
   if (entries.length === 0) {
-    return <div style={{ paddingTop:60, textAlign:"center", color:"#aaa", fontStyle:"italic" }}>No entries yet. Check in first.</div>;
+    return <div style={{ paddingTop:60, textAlign:"center", color:"#7A8FA8", fontStyle:"italic" }}>No entries yet. Start with a check-in.</div>;
   }
 
   return (
@@ -296,51 +332,43 @@ function AddInfo({ entries, onUpdate, onDelete }) {
         const open = expandedId === entry.id;
         const ri = rageInfo(entry.rageType);
         return (
-          <div key={entry.id} style={{ background:"#fff", borderRadius:14, marginBottom:14, boxShadow:"0 2px 12px rgba(0,0,0,0.07)", border:"1px solid #f0eaf8", overflow:"hidden" }}>
-
-            {/* Header */}
+          <div key={entry.id} style={{ background:"#FDFAF5", borderRadius:14, marginBottom:14, boxShadow:"0 2px 12px rgba(46,74,122,0.08)", border:"1px solid #DDD5C4", overflow:"hidden" }}>
             <div onClick={() => setExpandedId(open ? null : entry.id)}
               style={{ padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
-              <div style={{ width:40, height:40, borderRadius:"50%", background:angerColor(entry.angerLevel), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:"bold", fontSize:18, flexShrink:0 }}>{entry.angerLevel}</div>
+              <div style={{ width:40, height:40, borderRadius:"50%", background:angerColor(entry.angerLevel), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:"600", fontSize:18, flexShrink:0 }}>{entry.angerLevel}</div>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:13, color:"#4a3060", fontWeight:"bold" }}>{formatDate(entry.datetime)}</div>
-                {ri && <div style={{ fontSize:12, color:"#888", fontStyle:"italic" }}>{ri.label} — {ri.descriptor}</div>}
-                {entry.feelings?.length > 0 && <div style={{ fontSize:12, color:"#aaa", marginTop:2 }}>{entry.feelings.slice(0,3).join(", ")}{entry.feelings.length>3?"…":""}</div>}
+                <div style={{ fontSize:13, color:"#2E4A7A", fontWeight:"600" }}>{formatDate(entry.datetime)}</div>
+                {ri && <div style={{ fontSize:12, color:"#7A8FA8", fontStyle:"italic" }}>{ri.label} — {ri.descriptor}</div>}
+                {entry.feelings?.length > 0 && <div style={{ fontSize:12, color:"#B8A898", marginTop:2 }}>{entry.feelings.slice(0,3).join(", ")}{entry.feelings.length>3?"…":""}</div>}
               </div>
-              <div style={{ color:"#ccc", fontSize:18 }}>{open?"▲":"▼"}</div>
+              <div style={{ color:"#B8A898", fontSize:18 }}>{open?"▲":"▼"}</div>
             </div>
 
             {open && (
-              <div style={{ padding:"0 16px 18px", borderTop:"1px solid #f5f0fa" }}>
-
-                {/* Quick capture summary */}
+              <div style={{ padding:"0 16px 18px", borderTop:"1px solid #DDD5C4" }}>
                 {entry.feelings?.length > 0 && (
                   <div style={{ marginTop:12 }}>
                     <SectionDivider label="Feelings" />
                     <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                      {entry.feelings.map(f => <span key={f} style={{ padding:"3px 10px", background:"#f0eaf8", color:"#4a3060", borderRadius:12, fontSize:12 }}>{f}</span>)}
+                      {entry.feelings.map(f => <span key={f} style={{ padding:"3px 10px", background:"#DDE6F0", color:"#2E4A7A", borderRadius:12, fontSize:12 }}>{f}</span>)}
                     </div>
                   </div>
                 )}
-
                 {entry.expression?.length > 0 && (
                   <div style={{ marginTop:12 }}>
                     <SectionDivider label="What was my response?" />
                     <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                      {entry.expression.map(e => <span key={e} style={{ padding:"3px 10px", background:"#fff0e8", color:"#804020", borderRadius:12, fontSize:12 }}>{e}</span>)}
+                      {entry.expression.map(e => <span key={e} style={{ padding:"3px 10px", background:"#EDE8DE", color:"#5A3A1A", borderRadius:12, fontSize:12 }}>{e}</span>)}
                     </div>
                   </div>
                 )}
-
                 {entry.tookItOut && (
                   <div style={{ marginTop:12 }}>
-                    <span style={{ padding:"4px 12px", background:"#c0303022", color:"#7a0000", borderRadius:12, fontSize:12, fontWeight:"bold" }}>Took it out on someone</span>
+                    <span style={{ padding:"4px 12px", background:"#c0303022", color:"#7a0000", borderRadius:12, fontSize:12, fontWeight:"600" }}>Took it out on someone</span>
                   </div>
                 )}
 
-                {/* Editable reflection fields */}
-                <div style={{ marginTop:16, borderTop:"1px solid #f0eaf8", paddingTop:14 }}>
-
+                <div style={{ marginTop:16, borderTop:"1px solid #DDD5C4", paddingTop:14 }}>
                   <div style={{ marginBottom:14 }}>
                     <Label>What set it off?</Label>
                     <Hint>The immediate cause — what happened or was said?</Hint>
@@ -349,7 +377,7 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                   </div>
 
                   <div style={{ marginBottom:14 }}>
-                    <Label>Was something already bothering you? <span style={{ fontWeight:"normal", color:"#aaa" }}>(optional)</span></Label>
+                    <Label>Was something already bothering you? <span style={{ fontWeight:"normal", color:"#7A8FA8" }}>(optional)</span></Label>
                     <Hint>Was something already weighing on you before this happened?</Hint>
                     {entry.underlyingCauses || !entry.furtherInsights?.length ? (
                       <textarea value={entry.underlyingCauses||""} onChange={e => updateField(entry, "underlyingCauses", e.target.value)}
@@ -358,9 +386,9 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                     {entry.furtherInsights?.length > 0 && (
                       <div style={{ marginTop:8 }}>
                         {entry.furtherInsights.map((ins,i) => (
-                          <div key={i} style={{ padding:"10px 12px", background:"#eaf4f0", borderLeft:"3px solid #2d5a45", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
-                            <div style={{ fontSize:11, color:"#2d5a45", marginBottom:4, fontWeight:"bold" }}>{formatDate(ins.timestamp)}</div>
-                            <div style={{ fontSize:14, color:"#444", lineHeight:1.6 }}>{ins.text}</div>
+                          <div key={i} style={{ padding:"10px 12px", background:"#EDE8DE", borderLeft:"3px solid #4A6FA5", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
+                            <div style={{ fontSize:11, color:"#2E4A7A", marginBottom:4, fontWeight:"600" }}>{formatDate(ins.timestamp)}</div>
+                            <div style={{ fontSize:14, color:"#1A2E4A", lineHeight:1.6 }}>{ins.text}</div>
                           </div>
                         ))}
                       </div>
@@ -369,9 +397,9 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                       placeholder="Further insight… (optional)" style={{ ...textareaStyle, marginTop:6 }} rows={2} />
                     <button onClick={() => addInsight(entry)} disabled={!(insightDrafts[entry.id]||"").trim()} style={{
                       marginTop:6, padding:"7px 16px",
-                      background: (insightDrafts[entry.id]||"").trim() ? "#2d5a45" : "#ddd",
-                      color: (insightDrafts[entry.id]||"").trim() ? "#fff" : "#aaa",
-                      border:"none", borderRadius:8, fontSize:12, fontFamily:"Georgia,serif",
+                      background: (insightDrafts[entry.id]||"").trim() ? "#4A6FA5" : "#DDD5C4",
+                      color: (insightDrafts[entry.id]||"").trim() ? "#fff" : "#7A8FA8",
+                      border:"none", borderRadius:8, fontSize:12, fontFamily:"'Inter',sans-serif",
                       cursor: (insightDrafts[entry.id]||"").trim() ? "pointer" : "not-allowed"
                     }}>+ Further Insight</button>
                   </div>
@@ -388,7 +416,7 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                             background: active ? col : col+"22",
                             color: active ? "#fff" : col,
                             fontSize:13, fontWeight: active?"bold":"normal",
-                            cursor:"pointer", fontFamily:"Georgia,serif", transition:"all 0.2s"
+                            cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s"
                           }}>{lbl}</button>
                         );
                       })}
@@ -400,7 +428,7 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                   </div>
 
                   <div style={{ marginBottom:14 }}>
-                    <Label>How did the situation play out? <span style={{ fontWeight:"normal", color:"#aaa" }}>(optional)</span></Label>
+                    <Label>How did the situation play out? <span style={{ fontWeight:"normal", color:"#7A8FA8" }}>(optional)</span></Label>
                     <textarea value={entry.playedOut||""} onChange={e => updateField(entry, "playedOut", e.target.value)}
                       placeholder="Resolution, fallout, or still unresolved..." style={textareaStyle} rows={2} />
                   </div>
@@ -412,8 +440,8 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                   </div>
 
                   <div style={{ marginBottom:14 }}>
-                    <Label>Angry Thoughts</Label>
-                    <Hint>What were you telling yourself in that moment?</Hint>
+                    <Label>What were you telling yourself?</Label>
+                    <Hint>What thoughts were running through your mind in that moment?</Hint>
                     <textarea value={entry.angryThoughts||""} onChange={e => updateField(entry, "angryThoughts", e.target.value)}
                       placeholder="What thoughts were running through your mind..." style={textareaStyle} rows={2} />
                   </div>
@@ -428,15 +456,14 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                       placeholder="Any further reflection... (optional)" style={{ ...textareaStyle, marginTop:12 }} rows={2} />
                   </div>
 
-                  {/* Additional Reflections thread */}
-                  <div style={{ borderTop:"1px solid #f0eaf8", paddingTop:14 }}>
+                  <div style={{ borderTop:"1px solid #DDD5C4", paddingTop:14 }}>
                     <Label>Additional Reflections</Label>
                     {(entry.reflections||[]).length > 0 && (
                       <div style={{ marginTop:8, marginBottom:8 }}>
                         {entry.reflections.map((r,i) => (
-                          <div key={i} style={{ padding:"10px 12px", background:"#f0eaf8", borderLeft:"3px solid #7b6090", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
-                            <div style={{ fontSize:11, color:"#7b6090", marginBottom:4, fontWeight:"bold" }}>{formatDate(r.timestamp)}</div>
-                            <div style={{ fontSize:14, color:"#444", lineHeight:1.6 }}>{r.text}</div>
+                          <div key={i} style={{ padding:"10px 12px", background:"#DDE6F0", borderLeft:"3px solid #4A6FA5", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
+                            <div style={{ fontSize:11, color:"#2E4A7A", marginBottom:4, fontWeight:"600" }}>{formatDate(r.timestamp)}</div>
+                            <div style={{ fontSize:14, color:"#1A2E4A", lineHeight:1.6 }}>{r.text}</div>
                           </div>
                         ))}
                       </div>
@@ -445,16 +472,15 @@ function AddInfo({ entries, onUpdate, onDelete }) {
                       placeholder="Return to this entry with fresh eyes…" style={{ ...textareaStyle, marginTop:8 }} rows={2} />
                     <button onClick={() => addReflection(entry)} disabled={!(reflDrafts[entry.id]||"").trim()} style={{
                       marginTop:6, padding:"7px 16px",
-                      background: (reflDrafts[entry.id]||"").trim() ? "#4a3060" : "#ddd",
-                      color: (reflDrafts[entry.id]||"").trim() ? "#fff" : "#aaa",
-                      border:"none", borderRadius:8, fontSize:12, fontFamily:"Georgia,serif",
+                      background: (reflDrafts[entry.id]||"").trim() ? "#2E4A7A" : "#DDD5C4",
+                      color: (reflDrafts[entry.id]||"").trim() ? "#fff" : "#7A8FA8",
+                      border:"none", borderRadius:8, fontSize:12, fontFamily:"'Inter',sans-serif",
                       cursor: (reflDrafts[entry.id]||"").trim() ? "pointer" : "not-allowed"
                     }}>+ Add Reflection</button>
                   </div>
-
                 </div>
 
-                <button onClick={() => onDelete(entry.id)} style={{ marginTop:14, padding:"8px 16px", background:"transparent", border:"1px solid #e0c0c0", borderRadius:8, color:"#c08080", fontSize:12, cursor:"pointer", fontFamily:"Georgia,serif" }}>Delete entry</button>
+                <button onClick={() => onDelete(entry.id)} style={{ marginTop:14, padding:"8px 16px", background:"transparent", border:"1px solid #DDD5C4", borderRadius:8, color:"#B8A898", fontSize:12, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Delete entry</button>
               </div>
             )}
           </div>
@@ -478,6 +504,7 @@ function App() {
   const persist = updated => { setEntries(updated); saveEntries(updated); };
   const updateEntry = updated => persist(entries.map(e => e.id===updated.id ? updated : e));
   const deleteEntry = id => persist(entries.filter(e => e.id!==id));
+  const clearAll = () => persist([]);
 
   const toggle = (field, value) => setForm(f => ({
     ...f, [field]: f[field].includes(value) ? f[field].filter(v=>v!==value) : [...f[field], value]
@@ -505,28 +532,38 @@ function App() {
     { id:"checkin",  label:"Check-in" },
     { id:"addinfo",  label:"Add Info" },
     { id:"insights", label:"Insights" },
-    { id:"guide",    label:"Understanding Anger" },
+    { id:"guide",    label:"The SRP Guide" },
   ];
 
   return (
     <div style={{ minHeight:"100vh", paddingBottom:60 }}>
 
       {/* Header */}
-      <div style={{ background:"linear-gradient(135deg, #4a3060 0%, #2d5a45 100%)", padding:"28px 24px 20px", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>
-        <div style={{ fontSize:32, marginBottom:4 }}>🌿</div>
-        <h1 style={{ margin:0, color:"#fff", fontSize:26, fontWeight:"normal", letterSpacing:"0.02em" }}>Calm AM</h1>
-        <p style={{ margin:"6px 0 0", color:"rgba(255,255,255,0.7)", fontSize:13 }}>Your anger. Your patterns. Your peace.</p>
+      <div style={{ background:"linear-gradient(135deg, #2E4A7A 0%, #1A2E4A 100%)", padding:"28px 24px 20px", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>
+        <div style={{ marginBottom:8 }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="220" height="66" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M0,80 C20,80 30,78 50,76" />
+            <path d="M18,62 C18,55 24,50 31,52 C32,47 38,44 44,47 C50,44 56,48 55,54 C59,54 62,58 60,62 C58,66 52,67 46,66 C40,68 32,68 26,65 C21,64 18,63 18,62 Z" />
+            <path d="M50,76 C60,74 75,60 90,48 C100,38 108,32 115,36 C122,40 128,50 135,58 C140,64 148,70 160,74" />
+            <path d="M160,74 C170,68 185,52 200,28 C202,24 204,22 206,22 C208,22 210,24 212,28 C228,52 242,66 255,74" />
+            <path d="M255,74 C262,68 270,60 278,56 C284,52 288,54 292,58 C298,64 308,72 320,76" />
+            <path d="M318,54 C320,48 326,44 333,46 C335,41 341,39 347,42 C353,39 359,43 358,49 C362,50 364,54 362,58 C360,62 354,63 348,62 C342,64 334,63 328,61 C322,59 317,57 318,54 Z" />
+            <path d="M320,76 C340,78 360,80 400,80" />
+          </svg>
+        </div>
+        <h1 style={{ margin:0, color:"#fff", fontSize:26, fontWeight:"500", letterSpacing:"0.02em" }}>Calm AM</h1>
+        <p style={{ margin:"6px 0 0", color:"rgba(255,255,255,0.7)", fontSize:13 }}>Recognize. Regulate. Recover.</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display:"flex", background:"#fff", borderBottom:"1px solid #e8e0f0", boxShadow:"0 2px 8px rgba(0,0,0,0.05)", position:"sticky", top:0, zIndex:99 }}>
+      <div style={{ display:"flex", background:"#FDFAF5", borderBottom:"1px solid #DDD5C4", boxShadow:"0 2px 8px rgba(46,74,122,0.06)", position:"sticky", top:0, zIndex:99 }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             flex:1, padding:"13px 6px", border:"none", whiteSpace:"nowrap",
-            borderBottom: tab===t.id ? "3px solid #4a3060" : "3px solid transparent",
-            color: tab===t.id ? "#4a3060" : "#888", background:"transparent",
-            fontFamily:"Georgia,serif", fontSize:12,
-            fontWeight: tab===t.id ? "bold" : "normal", cursor:"pointer", transition:"all 0.2s"
+            borderBottom: tab===t.id ? "3px solid #2E4A7A" : "3px solid transparent",
+            color: tab===t.id ? "#2E4A7A" : "#7A8FA8", background:"transparent",
+            fontFamily:"'Inter',sans-serif", fontSize:12,
+            fontWeight: tab===t.id ? "600" : "normal", cursor:"pointer", transition:"all 0.2s"
           }}>{t.label}</button>
         ))}
       </div>
@@ -536,15 +573,13 @@ function App() {
         {/* ── CHECK-IN ── */}
         {tab === "checkin" && (
           <div style={{ paddingTop:24 }}>
-
             <div style={cardStyle}>
               <Label>Date &amp; Time</Label>
-              <div style={{ fontSize:15, color:"#4a3060", fontStyle:"italic", marginTop:6 }}>{formatDate(form.datetime)}</div>
+              <div style={{ fontSize:15, color:"#2E4A7A", fontStyle:"italic", marginTop:6 }}>{formatDate(form.datetime)}</div>
             </div>
 
-            {/* Anger Level */}
             <div style={cardStyle}>
-              <Label>Anger Level</Label>
+              <Label>Activation Level</Label>
               <div style={{ display:"flex", gap:10, marginTop:10 }}>
                 {ANGER_LEVELS.map(n => {
                   const active = form.angerLevel === n;
@@ -560,26 +595,25 @@ function App() {
                   );
                 })}
               </div>
-              {form.angerLevel > 0 && <div style={{ marginTop:8, fontSize:12, color:"#888", fontStyle:"italic" }}>{angerLabel(form.angerLevel)}</div>}
+              {form.angerLevel > 0 && <div style={{ marginTop:8, fontSize:12, color:"#7A8FA8", fontStyle:"italic" }}>{angerLabel(form.angerLevel)}</div>}
             </div>
 
-            {/* Rage Type */}
             <div style={cardStyle}>
-              <Label>What triggered it? <span style={{ fontWeight:"normal", color:"#aaa" }}>(optional)</span></Label>
+              <Label>Stress Response Pattern <span style={{ fontWeight:"normal", color:"#B8A898" }}>(optional)</span></Label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginTop:12 }}>
                 {RAGE_TYPES.map(r => {
                   const active = form.rageType === r.value;
                   return (
                     <button key={r.value} onClick={() => setForm(f => ({ ...f, rageType: active ? "" : r.value }))} style={{
                       padding:"10px 16px", borderRadius:12, cursor:"pointer",
-                      border: active ? "2.5px solid #4a3060" : "1.5px solid #d0c8e0",
-                      background: active ? "#4a3060" : "#faf8fc",
-                      color: active ? "#fff" : "#4a3060",
-                      fontFamily:"Georgia,serif", transition:"all 0.2s",
-                      boxShadow: active ? "0 2px 8px rgba(74,48,96,0.3)" : "none",
+                      border: active ? "2.5px solid #2E4A7A" : "1.5px solid #DDD5C4",
+                      background: active ? "#2E4A7A" : "#FDFAF5",
+                      color: active ? "#fff" : "#2E4A7A",
+                      fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+                      boxShadow: active ? "0 2px 8px rgba(46,74,122,0.3)" : "none",
                       textAlign:"center", minWidth:90
                     }}>
-                      <div style={{ fontSize:14, fontWeight:"bold" }}>{r.label}</div>
+                      <div style={{ fontSize:14, fontWeight:"600" }}>{r.label}</div>
                       <div style={{ fontSize:11, opacity:0.8, marginTop:2, fontStyle:"italic" }}>{r.descriptor}</div>
                     </button>
                   );
@@ -587,61 +621,56 @@ function App() {
               </div>
             </div>
 
-            {/* Feelings */}
             <div style={cardStyle}>
               <Label>Feelings</Label>
               <ToggleButtons items={FEELINGS} selected={form.feelings} onToggle={v => toggle("feelings", v)} />
             </div>
 
-            {/* How it came out */}
             <div style={cardStyle}>
               <Label>What was my response?</Label>
               <ToggleButtons items={EXPRESSIONS} selected={form.expression} onToggle={v => toggle("expression", v)} />
             </div>
 
-            {/* Took it out on someone */}
             <div style={cardStyle}>
               <button onClick={() => setForm(f => ({ ...f, tookItOut: !f.tookItOut }))} style={{
                 width:"100%", padding:"12px 16px", borderRadius:12,
                 border: form.tookItOut ? "2.5px solid #c03030" : "1.5px solid #c0303088",
                 background: form.tookItOut ? "#c03030" : "#c0303018",
                 color: form.tookItOut ? "#fff" : "#7a0000",
-                fontSize:14, fontWeight: form.tookItOut ? "bold" : "normal",
-                cursor:"pointer", fontFamily:"Georgia,serif", transition:"all 0.2s",
+                fontSize:14, fontWeight: form.tookItOut ? "600" : "normal",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
                 boxShadow: form.tookItOut ? "0 2px 10px rgba(192,48,48,0.35)" : "none"
               }}>
                 {form.tookItOut ? "✓ My anger landed on someone else" : "My anger landed on someone else"}
               </button>
             </div>
 
-            {/* Add Info inline */}
             <div style={{ marginBottom:14 }}>
               <button onClick={handleAddDetail} disabled={!canAddDetail} style={{
                 width:"100%", padding:"12px 16px", borderRadius:12,
-                border: (hasRedExpression || form.tookItOut) ? "2px solid #c03030" : canAddDetail ? "1.5px solid #4a306088" : "1.5px solid #ddd",
-                background: (hasRedExpression || form.tookItOut) ? "#c0303022" : canAddDetail ? "#4a306018" : "#f5f5f5",
-                color: (hasRedExpression || form.tookItOut) ? "#7a0000" : canAddDetail ? "#4a3060" : "#bbb",
+                border: (hasRedExpression || form.tookItOut) ? "2px solid #c03030" : canAddDetail ? "1.5px solid #2E4A7A88" : "1.5px solid #DDD5C4",
+                background: (hasRedExpression || form.tookItOut) ? "#c0303022" : canAddDetail ? "#2E4A7A18" : "#F5F0E8",
+                color: (hasRedExpression || form.tookItOut) ? "#7a0000" : canAddDetail ? "#2E4A7A" : "#B8A898",
                 fontSize:14, cursor: canAddDetail ? "pointer" : "not-allowed",
-                fontFamily:"Georgia,serif", transition:"all 0.2s",
-                fontWeight: (hasRedExpression || form.tookItOut) ? "bold" : "normal",
+                fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+                fontWeight: (hasRedExpression || form.tookItOut) ? "600" : "normal",
                 boxShadow: (hasRedExpression || form.tookItOut) ? "0 2px 10px rgba(192,48,48,0.25)" : "none"
               }}>
                 {(hasRedExpression || form.tookItOut) ? "⚠ Add more detail →" : "Add more detail →"}
               </button>
             </div>
 
-            {/* Save */}
             <button onClick={saveEntry} disabled={!canSave} style={{
               width:"100%", padding:16, marginTop:4,
-              background: canSave ? "linear-gradient(135deg, #4a3060, #2d5a45)" : "#ddd",
-              color: canSave ? "#fff" : "#aaa",
+              background: canSave ? "linear-gradient(135deg, #2E4A7A, #1A2E4A)" : "#DDD5C4",
+              color: canSave ? "#fff" : "#7A8FA8",
               border:"none", borderRadius:12, fontSize:16,
-              fontFamily:"Georgia,serif", cursor: canSave ? "pointer" : "not-allowed",
-              transition:"all 0.3s", boxShadow: canSave ? "0 4px 16px rgba(74,48,96,0.3)" : "none"
+              fontFamily:"'Inter',sans-serif", cursor: canSave ? "pointer" : "not-allowed",
+              transition:"all 0.3s", boxShadow: canSave ? "0 4px 16px rgba(46,74,122,0.3)" : "none"
             }}>
-              {saved ? "✓ Saved — you can always come back to this" : "Save"}
+              {saved ? "✓ Saved — you can always come back to this" : "Save Check-in"}
             </button>
-            {!canSave && <p style={{ textAlign:"center", color:"#bbb", fontSize:12, marginTop:8 }}>Set an anger level to save</p>}
+            {!canSave && <p style={{ textAlign:"center", color:"#B8A898", fontSize:12, marginTop:8 }}>Set an activation level to save</p>}
           </div>
         )}
 
@@ -649,20 +678,24 @@ function App() {
         {tab === "addinfo" && <AddInfo entries={entries} onUpdate={updateEntry} onDelete={deleteEntry} />}
 
         {/* ── INSIGHTS ── */}
-        {tab === "insights" && <Insights entries={entries} />}
+        {tab === "insights" && <Insights entries={entries} onClearAll={clearAll} />}
 
-        {/* ── UNDERSTANDING ANGER ── */}
+        {/* ── SRP GUIDE ── */}
         {tab === "guide" && (
           <div style={{ paddingTop:24 }}>
-            <h2 style={{ fontWeight:"normal", color:"#4a3060", fontSize:22, marginBottom:6, textAlign:"center" }}>Understanding Anger</h2>
-            <p style={{ textAlign:"center", color:"#999", fontSize:13, marginBottom:24, fontStyle:"italic" }}>Naming the root changes how you respond to it.</p>
+            <h2 style={{ fontWeight:"500", color:"#2E4A7A", fontSize:22, marginBottom:6, textAlign:"center" }}>The SRP Guide</h2>
+            <p style={{ textAlign:"center", color:"#7A8FA8", fontSize:13, marginBottom:16, fontStyle:"italic" }}>Naming the pattern changes how you respond to it.</p>
+            <div style={{ background:"#DDE6F0", borderRadius:14, padding:"14px 18px", marginBottom:24, border:"1px solid #4A6FA530" }}>
+              <div style={{ fontSize:13, fontWeight:"600", color:"#2E4A7A", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.04em" }}>What is an SRP?</div>
+              <p style={{ margin:0, fontSize:13, lineHeight:1.7, color:"#1A2E4A" }}>SRP stands for <strong>Stress Response Pattern</strong>. The characteristic way your nervous system reacts under specific kinds of emotional pressure. Each SRP is involuntary and pre-cognitive: it fires before conscious thought. Understanding your patterns is the first step toward regulating them.</p>
+            </div>
             {ANGER_EXPLANATIONS.map(({ type, color, summary, text }) => (
-              <div key={type} style={{ background:"#fff", borderRadius:14, marginBottom:16, boxShadow:"0 2px 12px rgba(0,0,0,0.07)", border:`1px solid ${color}30`, overflow:"hidden" }}>
+              <div key={type} style={{ background:"#FDFAF5", borderRadius:14, marginBottom:16, boxShadow:"0 2px 12px rgba(0,0,0,0.07)", border:`1px solid ${color}30`, overflow:"hidden" }}>
                 <div style={{ background:`linear-gradient(135deg, ${color}20, ${color}08)`, padding:"14px 18px", borderBottom:`2px solid ${color}40` }}>
-                  <h3 style={{ margin:0, color:color, fontSize:16, fontWeight:"bold" }}>{type}</h3>
+                  <h3 style={{ margin:0, color:color, fontSize:16, fontWeight:"600" }}>{type}</h3>
                   <div style={{ fontSize:13, color:color, marginTop:6, fontStyle:"italic", opacity:0.85 }}>{summary}</div>
                 </div>
-                <p style={{ margin:0, padding:"14px 18px", fontSize:14, lineHeight:1.7, color:"#444" }}>{text}</p>
+                <p style={{ margin:0, padding:"14px 18px", fontSize:14, lineHeight:1.7, color:"#1A2E4A" }}>{text}</p>
               </div>
             ))}
           </div>
