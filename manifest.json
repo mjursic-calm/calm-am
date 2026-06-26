@@ -1,0 +1,23 @@
+{
+  "name": "calmAM",
+  "short_name": "calmAM",
+  "description": "Recognize. Regulate. Recover.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#2E4A7A",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

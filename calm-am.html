@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="theme-color" content="#2E4A7A" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="calmAM" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="manifest.json" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>calmAM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F5F0E8; min-height: 100vh; font-family: 'Inter', sans-serif; color: #1A2E4A; }
+  textarea { outline: none; font-family: 'Inter', sans-serif; }
+  select { outline: none; }
+  button:focus { outline: none; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #EDE8DE; }
+  ::-webkit-scrollbar-thumb { background: #B8A898; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useEffect } = React;
+
+const RAGE_TYPES = [
+  { value: "survival",    label: "Survival",    descriptor: "Threatened" },
+  { value: "abandonment", label: "Attachment",  descriptor: "Losing someone" },
+  { value: "impotent",    label: "Powerlessness", descriptor: "Powerless" },
+  { value: "shame",       label: "Dignity",     descriptor: "Disrespected" },
+  { value: "seething",    label: "Grievance",   descriptor: "Slow burn" },
+];
+
+const FEELINGS = [
+  { label: "Sad",          color: "#7ab87a", dark: "#3a6e3a" },
+  { label: "Fearful",      color: "#7ab87a", dark: "#3a6e3a" },
+  { label: "Anxious",      color: "#e0c84a", dark: "#7a6a00" },
+  { label: "Hurt",         color: "#e0c84a", dark: "#7a6a00" },
+  { label: "Frustrated",   color: "#e0883a", dark: "#7a3a00" },
+  { label: "Betrayed",     color: "#e0883a", dark: "#7a3a00" },
+  { label: "Powerless",    color: "#e0883a", dark: "#7a3a00" },
+  { label: "Disrespected", color: "#c03030", dark: "#7a0000" },
+  { label: "Humiliated",   color: "#c03030", dark: "#7a0000" },
+  { label: "Overwhelmed",  color: "#c03030", dark: "#7a0000" },
+];
+
+const EXPRESSIONS = [
+  { label: "Assertive",           color: "#7ab87a", dark: "#3a6e3a" },
+  { label: "Physical Release",    color: "#7ab87a", dark: "#3a6e3a" },
+  { label: "Physically Tense",    color: "#e0c84a", dark: "#7a6a00" },
+  { label: "Brooding",            color: "#e0c84a", dark: "#7a6a00" },
+  { label: "Ruminating",          color: "#e0c84a", dark: "#7a6a00" },
+  { label: "Cried",               color: "#e0883a", dark: "#7a3a00" },
+  { label: "Stonewalling",        color: "#e0883a", dark: "#7a3a00" },
+  { label: "Sulking",             color: "#e0883a", dark: "#7a3a00" },
+  { label: "Silent Treatment",    color: "#e0883a", dark: "#7a3a00" },
+  { label: "Passive Aggressive",  color: "#e0883a", dark: "#7a3a00" },
+  { label: "Sarcasm",             color: "#e0883a", dark: "#7a3a00" },
+  { label: "Seething",            color: "#d4602a", dark: "#7a2a00" },
+  { label: "Yelled",              color: "#c03030", dark: "#7a0000" },
+  { label: "Verbal Attack",       color: "#c03030", dark: "#7a0000" },
+  { label: "Exploded",            color: "#c03030", dark: "#7a0000" },
+  { label: "Physical Aggression", color: "#c03030", dark: "#7a0000" },
+];
+
+const MOODS = ["Calm","Relieved","Ashamed","Regretful","Still Frustrated","Sad","Proud","Anxious","Grateful"];
+
+const ANGER_EXPLANATIONS = [
+  { type: "Survival Impulse", color: "#e07b54", summary: "You feel physically threatened or unsafe.", text: "This response is often explosive and primal. It's triggered when your physical safety or existence feels under threat — the activation beneath fight-or-flight. It can show up in dramatic situations like a car nearly hitting you, feeling cornered or trapped, or moments of physical danger. Your body tends to react before the thought forms. (It is precognitive)" },
+  { type: "Attachment Impulse", color: "#7b8ce0", summary: "You feel like someone important is pulling away.", text: "This pattern appears when someone important feels like they're leaving, withdrawing, or choosing something else over you, whether through literal separation or emotional distance. The intense feeling is often a mask over profound fear. Some people find this pattern to be a frequent visitor. At its root it protects your connections with others." },
+  { type: "Powerlessness Impulse", color: "#54a87b", summary: "You feel powerless, like nothing you do will change anything.", text: "This response occurs when you want to change something but can't. When you're being overruled, ignored, or steamrolled with no effective recourse. It tends to turn inward as much as outward, which is why it's often accompanied by shame or despair. It's corrosive over time precisely because the situation that triggers it often doesn't change." },
+  { type: "Dignity Impulse", color: "#c06090", summary: "You feel disrespected, humiliated, or made to feel small.", text: "This pattern fires when your dignity feels violated. Being mocked, dismissed, disrespected, or publicly humiliated. Sometimes called the Humiliation Impulse. Your activation is a defense of the self: You don't get to make me small. You aren't responding to the slight itself. You're responding to what it means about your self-worth. In adolescents especially, this is enormously powerful." },
+  { type: "Grievance Impulse", color: "#8b4040", summary: "Activation that builds slowly over time until it can't stay inside.", text: "This slow-burn pattern accumulates quietly over time rather than erupting in the moment. You construct a story: I have been wronged, overlooked, pushed out, made irrelevant, and that story hardens into grievance. The acute danger is that it doesn't fade: it builds. It's the pattern that looks like calm from the outside until it isn't. This can be the most significant type and is commonly seen in cases of prolonged isolation and marginalization." },
+];
+
+const ANGER_LEVELS = [1,2,3,4,5];
+const angerColor = (n) => ["","#7ab87a","#e0c84a","#e0883a","#c03030","#7a1040"][n] || "#ccc";
+const angerDark  = (n) => ["","#3a6e3a","#7a6a00","#7a3a00","#7a0000","#3a0020"][n] || "#999";
+const angerLabel = (n) => ["","Mild irritation","Noticeable frustration","Significant activation","Intense activation","Overwhelming activation"][n] || "";
+
+function formatDate(d) {
+  return new Date(d).toLocaleString("en-CA", { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+const emptyForm = () => ({
+  datetime: new Date().toISOString(),
+  angerLevel: 0,
+  rageType: [],
+  feelings: [],
+  expression: [],
+  tookItOut: false,
+});
+
+const STORAGE_KEY = "anger-journal-v4";
+function loadEntries() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return raw.map(e => ({
+      ...e,
+      rageType: Array.isArray(e.rageType) ? e.rageType : (e.rageType ? [e.rageType] : [])
+    }));
+  } catch { return []; }
+}
+function saveEntries(e) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(e)); } catch {} }
+
+const cardStyle = { background:"#FDFAF5", borderRadius:14, padding:"16px 18px", marginBottom:14, boxShadow:"0 2px 12px rgba(46,74,122,0.08)", border:"1px solid #DDD5C4" };
+const textareaStyle = { width:"100%", padding:"10px 12px", marginTop:8, borderRadius:8, border:"1px solid #DDD5C4", fontFamily:"'Inter',sans-serif", fontSize:14, color:"#1A2E4A", background:"#F5F0E8", resize:"vertical", lineHeight:1.6 };
+
+function Label({ children }) {
+  return <div style={{ fontSize:13, fontWeight:"600", color:"#2E4A7A", letterSpacing:"0.04em", textTransform:"uppercase" }}>{children}</div>;
+}
+function Hint({ children }) {
+  return <div style={{ fontSize:12, color:"#7A8FA8", marginTop:2, fontStyle:"italic" }}>{children}</div>;
+}
+function SectionDivider({ label }) {
+  return <div style={{ fontSize:11, color:"#B8A898", textTransform:"uppercase", letterSpacing:"0.1em", marginTop:16, marginBottom:4 }}>{label}</div>;
+}
+
+function ToggleButtons({ items, selected, onToggle }) {
+  return (
+    <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:10 }}>
+      {items.map(item => {
+        const label  = typeof item === "string" ? item : item.label;
+        const isStr  = typeof item === "string";
+        const base   = isStr ? "#2E4A7A" : item.color;
+        const dark   = isStr ? "#1A2E4A" : item.dark;
+        const active = selected.includes(label);
+        return (
+          <button key={label} onClick={() => onToggle(label)} style={{
+            padding:"7px 14px", borderRadius:20,
+            border: active ? `2.5px solid ${dark}` : `1.5px solid ${base}88`,
+            background: active ? base : base+"22",
+            color: active ? "#fff" : dark,
+            fontSize:13, cursor:"pointer", fontFamily:"'Inter',sans-serif",
+            fontWeight: active ? "bold" : "normal",
+            transition:"all 0.2s",
+            boxShadow: active ? `0 2px 8px ${base}70` : "none"
+          }}>{label}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── INSIGHTS ──
+function Insights({ entries, onClearAll }) {
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
+  if (entries.length < 2) {
+    return <div style={{ paddingTop:60, textAlign:"center", color:"#7A8FA8", fontStyle:"italic" }}>Add a few more entries to start seeing patterns.</div>;
+  }
+
+  const levelCounts = [1,2,3,4,5].map(n => ({ level:n, count:entries.filter(e => e.angerLevel===n).length }));
+  const maxCount = Math.max(...levelCounts.map(l => l.count), 1);
+
+  const rageCounts = {};
+  entries.forEach(e => { (e.rageType||[]).forEach(rt => { rageCounts[rt] = (rageCounts[rt]||0)+1; }); });
+  const rageRanked = Object.entries(rageCounts).sort((a,b)=>b[1]-a[1]);
+  const rageMax = rageRanked.length ? rageRanked[0][1] : 1;
+  const rageLabel = v => RAGE_TYPES.find(r=>r.value===v)?.label || v;
+
+  const feelingExprMap = {};
+  entries.forEach(e => {
+    (e.feelings||[]).forEach(f => {
+      if (!feelingExprMap[f]) feelingExprMap[f] = {};
+      (e.expression||[]).forEach(ex => { feelingExprMap[f][ex] = (feelingExprMap[f][ex]||0)+1; });
+    });
+  });
+  const feelingInsights = Object.entries(feelingExprMap)
+    .map(([feeling, em]) => { const top = Object.entries(em).sort((a,b)=>b[1]-a[1])[0]; return top ? { feeling, expression:top[0] } : null; })
+    .filter(Boolean).slice(0,6);
+
+  const rageExprMap = {};
+  entries.forEach(e => {
+    (e.rageType||[]).forEach(rt => {
+      if (!rageExprMap[rt]) rageExprMap[rt] = {};
+      (e.expression||[]).forEach(ex => { rageExprMap[rt][ex] = (rageExprMap[rt][ex]||0)+1; });
+    });
+  });
+  const rageExprInsights = Object.entries(rageExprMap)
+    .map(([rage, em]) => { const top = Object.entries(em).sort((a,b)=>b[1]-a[1])[0]; return top ? { rage:rageLabel(rage), expression:top[0] } : null; })
+    .filter(Boolean);
+
+  const SH = ({ t }) => <div style={{ fontSize:15, fontWeight:"600", color:"#2E4A7A", margin:"24px 0 10px", borderBottom:"1px solid #DDD5C4", paddingBottom:6 }}>{t}</div>;
+  const pill = (text, bg, fg) => <span style={{ padding:"4px 12px", background:bg, borderRadius:12, fontSize:13, color:fg, fontWeight:"600" }}>{text}</span>;
+
+  return (
+    <div style={{ paddingTop:24 }}>
+      <h2 style={{ fontWeight:"600", color:"#2E4A7A", fontSize:22, marginBottom:4, textAlign:"center" }}>Insights</h2>
+      <p style={{ textAlign:"center", color:"#7A8FA8", fontSize:13, marginBottom:8, fontStyle:"italic" }}>Based on {entries.length} {entries.length===1?"entry":"entries"}</p>
+
+      <SH t="Activation Level Distribution" />
+      <div style={cardStyle}>
+        {levelCounts.map(({ level, count }) => (
+          <div key={level} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+            <div style={{ width:28, height:28, borderRadius:"50%", background:angerColor(level), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:"bold", fontSize:13, flexShrink:0 }}>{level}</div>
+            <div style={{ flex:1, background:"#EDE8DE", borderRadius:6, height:22, overflow:"hidden" }}>
+              <div style={{ width:`${(count/maxCount)*100}%`, background:angerColor(level), height:"100%", borderRadius:6, minWidth:count>0?6:0 }} />
+            </div>
+            <div style={{ width:24, textAlign:"right", fontSize:13, color:"#7A8FA8" }}>{count}</div>
+          </div>
+        ))}
+      </div>
+
+      {rageRanked.length > 0 && <>
+        <SH t="Most Frequent Stress Response Patterns" />
+        <div style={cardStyle}>
+          {rageRanked.map(([value, count]) => (
+            <div key={value} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+              <div style={{ width:110, fontSize:13, color:"#1A2E4A", flexShrink:0 }}>{rageLabel(value)}</div>
+              <div style={{ flex:1, background:"#EDE8DE", borderRadius:6, height:22, overflow:"hidden" }}>
+                <div style={{ width:`${(count/rageMax)*100}%`, background:"#4A6FA5", height:"100%", borderRadius:6, minWidth:count>0?6:0 }} />
+              </div>
+              <div style={{ width:24, textAlign:"right", fontSize:13, color:"#7A8FA8" }}>{count}</div>
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {feelingInsights.length > 0 && <>
+        <SH t="When you feel… you tend to…" />
+        <div style={cardStyle}>
+          {feelingInsights.map(({ feeling, expression }) => (
+            <div key={feeling} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
+              {pill(feeling, "#DDE6F0", "#2E4A7A")}
+              <span style={{ color:"#B8A898" }}>→</span>
+              {pill(expression, "#EDE8DE", "#5A3A1A")}
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {rageExprInsights.length > 0 && <>
+        <SH t="SRP → most common reaction" />
+        <div style={{ ...cardStyle, marginBottom:32 }}>
+          {rageExprInsights.map(({ rage, expression }) => (
+            <div key={rage} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
+              {pill(rage, "#DDE6F0", "#2E4A7A")}
+              <span style={{ color:"#B8A898" }}>→</span>
+              {pill(expression, "#EDE8DE", "#5A3A1A")}
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {/* Clear Entries */}
+      <div style={{ marginTop:32, marginBottom:32, borderTop:"1px solid #DDD5C4", paddingTop:24 }}>
+        {!showConfirm ? (
+          <button onClick={() => setShowConfirm(true)} style={{
+            width:"100%", padding:"11px 16px", borderRadius:12,
+            border:"1px solid #DDD5C4", background:"transparent",
+            color:"#B8A898", fontSize:13, cursor:"pointer",
+            fontFamily:"'Inter',sans-serif", transition:"all 0.2s"
+          }}>Clear all entries…</button>
+        ) : (
+          <div style={{ background:"#FDFAF5", borderRadius:14, padding:"18px", border:"2px solid #c03030" }}>
+            <div style={{ fontSize:15, fontWeight:"600", color:"#7a0000", marginBottom:8 }}>Permanently delete all {entries.length} entries?</div>
+            <p style={{ fontSize:13, color:"#1A2E4A", lineHeight:1.6, marginBottom:16 }}>This cannot be undone. Your entire journal history will be erased.</p>
+            <div style={{ display:"flex", gap:10 }}>
+              <button onClick={() => setShowConfirm(false)} style={{
+                flex:1, padding:"10px", borderRadius:10,
+                border:"1.5px solid #DDD5C4", background:"#F5F0E8",
+                color:"#2E4A7A", fontSize:13, fontWeight:"600",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif"
+              }}>Cancel</button>
+              <button onClick={() => { onClearAll(); setShowConfirm(false); }} style={{
+                flex:1, padding:"10px", borderRadius:10,
+                border:"none", background:"#c03030",
+                color:"#fff", fontSize:13, fontWeight:"600",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif"
+              }}>Yes, delete everything</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <p style={{ textAlign:"center", color:"#B8A898", fontSize:11, marginTop:8, marginBottom:8 }}>© 2026 Michael Jursic. All rights reserved.</p>
+    </div>
+  );
+}
+
+// ── ADD INFO (log with reflection) ──
+function AddInfo({ entries, onUpdate, onDelete }) {
+  const [expandedId, setExpandedId] = useState(null);
+  const [reflDrafts, setReflDrafts] = useState({});
+  const [insightDrafts, setInsightDrafts] = useState({});
+  const [entryData, setEntryData] = useState({});
+
+  const rageInfo = v => RAGE_TYPES.find(r => r.value === v);
+
+  const updateDraft = (setter, id, val) => setter(prev => ({ ...prev, [id]: val }));
+
+  const addReflection = (entry) => {
+    const text = (reflDrafts[entry.id]||"").trim();
+    if (!text) return;
+    const updated = { ...entry, reflections: [...(entry.reflections||[]), { text, timestamp: new Date().toISOString() }] };
+    onUpdate(updated);
+    updateDraft(setReflDrafts, entry.id, "");
+  };
+
+  const addInsight = (entry) => {
+    const text = (insightDrafts[entry.id]||"").trim();
+    if (!text) return;
+    const updated = { ...entry, furtherInsights: [...(entry.furtherInsights||[]), { text, timestamp: new Date().toISOString() }] };
+    onUpdate(updated);
+    updateDraft(setInsightDrafts, entry.id, "");
+  };
+
+  const updateField = (entry, field, value) => {
+    onUpdate({ ...entry, [field]: value });
+  };
+
+  if (entries.length === 0) {
+    return <div style={{ paddingTop:60, textAlign:"center", color:"#7A8FA8", fontStyle:"italic" }}>No entries yet. Start with a check-in.</div>;
+  }
+
+  return (
+    <div style={{ paddingTop:24 }}>
+      {entries.map(entry => {
+        const open = expandedId === entry.id;
+        const rageLabels = (entry.rageType||[]).map(v => rageInfo(v)?.label).filter(Boolean);
+        return (
+          <div key={entry.id} style={{ background:"#FDFAF5", borderRadius:14, marginBottom:14, boxShadow:"0 2px 12px rgba(46,74,122,0.08)", border:"1px solid #DDD5C4", overflow:"hidden" }}>
+
+            {/* Header */}
+            <div onClick={() => setExpandedId(open ? null : entry.id)}
+              style={{ padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
+              <div style={{ width:40, height:40, borderRadius:"50%", background:angerColor(entry.angerLevel), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:"600", fontSize:18, flexShrink:0 }}>{entry.angerLevel}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13, color:"#2E4A7A", fontWeight:"600" }}>{formatDate(entry.datetime)}</div>
+                {rageLabels.length > 0 && <div style={{ fontSize:12, color:"#7A8FA8", fontStyle:"italic" }}>{rageLabels.join(", ")}</div>}
+                {entry.feelings?.length > 0 && <div style={{ fontSize:12, color:"#B8A898", marginTop:2 }}>{entry.feelings.slice(0,3).join(", ")}{entry.feelings.length>3?"…":""}</div>}
+              </div>
+              <div style={{ color:"#B8A898", fontSize:18 }}>{open?"▲":"▼"}</div>
+            </div>
+
+            {open && (
+              <div style={{ padding:"0 16px 18px", borderTop:"1px solid #DDD5C4" }}>
+
+                {/* Quick capture summary */}
+                {entry.feelings?.length > 0 && (
+                  <div style={{ marginTop:12 }}>
+                    <SectionDivider label="Feelings" />
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {entry.feelings.map(f => <span key={f} style={{ padding:"3px 10px", background:"#DDE6F0", color:"#2E4A7A", borderRadius:12, fontSize:12 }}>{f}</span>)}
+                    </div>
+                  </div>
+                )}
+
+                {entry.expression?.length > 0 && (
+                  <div style={{ marginTop:12 }}>
+                    <SectionDivider label="What was my response?" />
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {entry.expression.map(e => <span key={e} style={{ padding:"3px 10px", background:"#EDE8DE", color:"#5A3A1A", borderRadius:12, fontSize:12 }}>{e}</span>)}
+                    </div>
+                  </div>
+                )}
+
+                {entry.tookItOut && (
+                  <div style={{ marginTop:12 }}>
+                    <span style={{ padding:"4px 12px", background:"#c0303022", color:"#7a0000", borderRadius:12, fontSize:12, fontWeight:"600" }}>Took it out on someone</span>
+                  </div>
+                )}
+
+                {/* Editable reflection fields */}
+                <div style={{ marginTop:16, borderTop:"1px solid #DDD5C4", paddingTop:14 }}>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>What set it off?</Label>
+                    <Hint>The immediate cause — what happened or was said?</Hint>
+                    <textarea value={entry.circumstances||""} onChange={e => updateField(entry, "circumstances", e.target.value)}
+                      placeholder="What happened, or what was said..." style={textareaStyle} rows={2} />
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>Was something already bothering you? <span style={{ fontWeight:"normal", color:"#7A8FA8" }}>(optional)</span></Label>
+                    <Hint>Was something already weighing on you before this happened?</Hint>
+                    {entry.underlyingCauses || !entry.furtherInsights?.length ? (
+                      <textarea value={entry.underlyingCauses||""} onChange={e => updateField(entry, "underlyingCauses", e.target.value)}
+                        placeholder="Was something already weighing on you before this happened?" style={textareaStyle} rows={2} />
+                    ) : null}
+                    {entry.furtherInsights?.length > 0 && (
+                      <div style={{ marginTop:8 }}>
+                        {entry.furtherInsights.map((ins,i) => (
+                          <div key={i} style={{ padding:"10px 12px", background:"#EDE8DE", borderLeft:"3px solid #4A6FA5", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
+                            <div style={{ fontSize:11, color:"#2E4A7A", marginBottom:4, fontWeight:"600" }}>{formatDate(ins.timestamp)}</div>
+                            <div style={{ fontSize:14, color:"#1A2E4A", lineHeight:1.6 }}>{ins.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <textarea value={insightDrafts[entry.id]||""} onChange={e => updateDraft(setInsightDrafts, entry.id, e.target.value)}
+                      placeholder="Further insight… (optional)" style={{ ...textareaStyle, marginTop:6 }} rows={2} />
+                    <button onClick={() => addInsight(entry)} disabled={!(insightDrafts[entry.id]||"").trim()} style={{
+                      marginTop:6, padding:"7px 16px",
+                      background: (insightDrafts[entry.id]||"").trim() ? "#4A6FA5" : "#DDD5C4",
+                      color: (insightDrafts[entry.id]||"").trim() ? "#fff" : "#7A8FA8",
+                      border:"none", borderRadius:8, fontSize:12, fontFamily:"'Inter',sans-serif",
+                      cursor: (insightDrafts[entry.id]||"").trim() ? "pointer" : "not-allowed"
+                    }}>+ Further Insight</button>
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>Did this land on someone who didn't deserve it?</Label>
+                    <div style={{ display:"flex", gap:10, marginTop:10 }}>
+                      {[["Yes","#c03030"],["No","#7ab87a"],["Not sure","#e0883a"]].map(([lbl,col]) => {
+                        const active = entry.landedOnSomeone === lbl;
+                        return (
+                          <button key={lbl} onClick={() => updateField(entry, "landedOnSomeone", active ? null : lbl)} style={{
+                            padding:"7px 14px", borderRadius:20,
+                            border: active ? `2.5px solid ${col}` : `1.5px solid ${col}88`,
+                            background: active ? col : col+"22",
+                            color: active ? "#fff" : col,
+                            fontSize:13, fontWeight: active?"bold":"normal",
+                            cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s"
+                          }}>{lbl}</button>
+                        );
+                      })}
+                    </div>
+                    {(entry.landedOnSomeone==="Yes"||entry.landedOnSomeone==="Not sure") && (
+                      <textarea value={entry.landedOnWho||""} onChange={e => updateField(entry, "landedOnWho", e.target.value)}
+                        placeholder="What happened between you two? (optional)" style={{ ...textareaStyle, marginTop:10 }} rows={2} />
+                    )}
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>How did the situation play out? <span style={{ fontWeight:"normal", color:"#7A8FA8" }}>(optional)</span></Label>
+                    <textarea value={entry.playedOut||""} onChange={e => updateField(entry, "playedOut", e.target.value)}
+                      placeholder="Resolution, fallout, or still unresolved..." style={textareaStyle} rows={2} />
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>What did you do?</Label>
+                    <textarea value={entry.whatYouDid||""} onChange={e => updateField(entry, "whatYouDid", e.target.value)}
+                      placeholder="Left the room, sent a message, went for a walk..." style={textareaStyle} rows={2} />
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>What were you telling yourself?</Label>
+                    <Hint>What thoughts were running through your mind in that moment?</Hint>
+                    <textarea value={entry.angryThoughts||""} onChange={e => updateField(entry, "angryThoughts", e.target.value)}
+                      placeholder="What thoughts were running through your mind..." style={textareaStyle} rows={2} />
+                  </div>
+
+                  <div style={{ marginBottom:14 }}>
+                    <Label>After Cooling Down</Label>
+                    <ToggleButtons items={MOODS} selected={entry.coolingMood||[]} onToggle={mood => {
+                      const current = entry.coolingMood||[];
+                      updateField(entry, "coolingMood", current.includes(mood) ? current.filter(m=>m!==mood) : [...current, mood]);
+                    }} />
+                    <textarea value={entry.coolingNotes||""} onChange={e => updateField(entry, "coolingNotes", e.target.value)}
+                      placeholder="Any further reflection... (optional)" style={{ ...textareaStyle, marginTop:12 }} rows={2} />
+                  </div>
+
+                  {/* Additional Reflections thread */}
+                  <div style={{ borderTop:"1px solid #DDD5C4", paddingTop:14 }}>
+                    <Label>Additional Reflections</Label>
+                    {(entry.reflections||[]).length > 0 && (
+                      <div style={{ marginTop:8, marginBottom:8 }}>
+                        {entry.reflections.map((r,i) => (
+                          <div key={i} style={{ padding:"10px 12px", background:"#DDE6F0", borderLeft:"3px solid #4A6FA5", borderRadius:"0 8px 8px 0", marginBottom:6 }}>
+                            <div style={{ fontSize:11, color:"#2E4A7A", marginBottom:4, fontWeight:"600" }}>{formatDate(r.timestamp)}</div>
+                            <div style={{ fontSize:14, color:"#1A2E4A", lineHeight:1.6 }}>{r.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <textarea value={reflDrafts[entry.id]||""} onChange={e => updateDraft(setReflDrafts, entry.id, e.target.value)}
+                      placeholder="Return to this entry with fresh eyes…" style={{ ...textareaStyle, marginTop:8 }} rows={2} />
+                    <button onClick={() => addReflection(entry)} disabled={!(reflDrafts[entry.id]||"").trim()} style={{
+                      marginTop:6, padding:"7px 16px",
+                      background: (reflDrafts[entry.id]||"").trim() ? "#2E4A7A" : "#DDD5C4",
+                      color: (reflDrafts[entry.id]||"").trim() ? "#fff" : "#7A8FA8",
+                      border:"none", borderRadius:8, fontSize:12, fontFamily:"'Inter',sans-serif",
+                      cursor: (reflDrafts[entry.id]||"").trim() ? "pointer" : "not-allowed"
+                    }}>+ Add Reflection</button>
+                  </div>
+
+                </div>
+
+                <button onClick={() => onDelete(entry.id)} style={{ marginTop:14, padding:"8px 16px", background:"transparent", border:"1px solid #DDD5C4", borderRadius:8, color:"#B8A898", fontSize:12, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Delete entry</button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── MAIN APP ──
+function App() {
+  const [tab, setTab]       = useState("checkin");
+  const [form, setForm]     = useState(emptyForm());
+  const [entries, setEntries] = useState(loadEntries);
+  const [saved, setSaved]   = useState(false);
+
+  useEffect(() => {
+    if (tab === "checkin") setForm(f => ({ ...f, datetime: new Date().toISOString() }));
+  }, [tab]);
+
+  const persist = updated => { setEntries(updated); saveEntries(updated); };
+  const updateEntry = updated => persist(entries.map(e => e.id===updated.id ? updated : e));
+  const deleteEntry = id => persist(entries.filter(e => e.id!==id));
+  const clearAll = () => persist([]);
+
+  const toggle = (field, value) => setForm(f => ({
+    ...f, [field]: f[field].includes(value) ? f[field].filter(v=>v!==value) : [...f[field], value]
+  }));
+
+  const saveEntry = () => {
+    persist([{ ...form, id:Date.now(), reflections:[], furtherInsights:[] }, ...entries]);
+    setSaved(true);
+    setTimeout(() => { setSaved(false); setForm(emptyForm()); }, 2000);
+  };
+
+  const canSave = form.angerLevel > 0;
+  const canAddDetail = form.angerLevel > 0 || form.tookItOut || form.expression.some(e => ["Seething","Yelled","Verbal Attack","Exploded","Physical Aggression"].includes(e));
+
+  const handleAddDetail = () => {
+    const newEntry = { ...form, id: Date.now(), reflections:[], furtherInsights:[] };
+    persist([newEntry, ...entries]);
+    setForm(emptyForm());
+    setTimeout(() => setTab("addinfo"), 150);
+  };
+  const RED_EXPRESSIONS = ["Seething","Yelled","Verbal Attack","Exploded","Physical Aggression"];
+  const hasRedExpression = form.expression.some(e => RED_EXPRESSIONS.includes(e));
+
+  const TABS = [
+    { id:"start",    label:"Getting Started" },
+    { id:"checkin",  label:"Check-in" },
+    { id:"addinfo",  label:"Add Info" },
+    { id:"insights", label:"Insights" },
+    { id:"guide",    label:"The SRP Guide" },
+  ];
+
+  return (
+    <div style={{ minHeight:"100vh", paddingBottom:60 }}>
+
+      {/* Header */}
+      <div style={{ background:"linear-gradient(135deg, #2E4A7A 0%, #1A2E4A 100%)", padding:"28px 24px 20px", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>
+        <div style={{ marginBottom:8 }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="220" height="66" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M0,80 C20,80 30,78 50,76" />
+            <path d="M18,62 C18,55 24,50 31,52 C32,47 38,44 44,47 C50,44 56,48 55,54 C59,54 62,58 60,62 C58,66 52,67 46,66 C40,68 32,68 26,65 C21,64 18,63 18,62 Z" />
+            <path d="M50,76 C60,74 75,60 90,48 C100,38 108,32 115,36 C122,40 128,50 135,58 C140,64 148,70 160,74" />
+            <path d="M160,74 C170,68 185,52 200,28 C202,24 204,22 206,22 C208,22 210,24 212,28 C228,52 242,66 255,74" />
+            <path d="M255,74 C262,68 270,60 278,56 C284,52 288,54 292,58 C298,64 308,72 320,76" />
+            <path d="M318,54 C320,48 326,44 333,46 C335,41 341,39 347,42 C353,39 359,43 358,49 C362,50 364,54 362,58 C360,62 354,63 348,62 C342,64 334,63 328,61 C322,59 317,57 318,54 Z" />
+            <path d="M320,76 C340,78 360,80 400,80" />
+          </svg>
+        </div>
+        <h1 style={{ margin:0, color:"#fff", fontSize:26, fontWeight:"500", letterSpacing:"0.02em" }}>calmAM</h1>
+        <p style={{ margin:"6px 0 0", color:"rgba(255,255,255,0.7)", fontSize:13 }}>Recognize. Regulate. Recover.</p>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display:"flex", background:"#FDFAF5", borderBottom:"1px solid #DDD5C4", boxShadow:"0 2px 8px rgba(46,74,122,0.06)", position:"sticky", top:0, zIndex:99 }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            flex:1, padding:"13px 6px", border:"none", whiteSpace:"nowrap",
+            borderBottom: tab===t.id ? "3px solid #2E4A7A" : "3px solid transparent",
+            color: tab===t.id ? "#2E4A7A" : "#7A8FA8", background:"transparent",
+            fontFamily:"'Inter',sans-serif", fontSize:12,
+            fontWeight: tab===t.id ? "600" : "normal", cursor:"pointer", transition:"all 0.2s"
+          }}>{t.label}</button>
+        ))}
+      </div>
+
+      <div style={{ maxWidth:600, margin:"0 auto", padding:"0 16px" }}>
+
+        {/* ── CHECK-IN ── */}
+        {/* ── GETTING STARTED ── */}
+        {tab === "start" && (
+          <div style={{ paddingTop:24 }}>
+            <h2 style={{ fontWeight:"500", color:"#2E4A7A", fontSize:22, marginBottom:6, textAlign:"center" }}>Welcome to calmAM</h2>
+            <p style={{ textAlign:"center", color:"#7A8FA8", fontSize:13, marginBottom:24, fontStyle:"italic" }}>A private space to recognize, regulate, and recover.</p>
+
+            <div style={cardStyle}>
+              <Label>What This App Is For</Label>
+              <p style={{ fontSize:14, lineHeight:1.7, color:"#1A2E4A", marginTop:8 }}>calmAM is a personal journal for moments of strong activation, frustration, or anger. The goal isn't to suppress these feelings, it's to understand the pattern behind them so you can respond with more choice and less reactivity over time.</p>
+            </div>
+
+            <div style={cardStyle}>
+              <Label>Check-in</Label>
+              <p style={{ fontSize:14, lineHeight:1.7, color:"#1A2E4A", marginTop:8 }}>Log a moment as it happens or shortly after. Pick your activation level, the stress response pattern(s) that fit, what you felt, and what you did. Save when you're ready.</p>
+            </div>
+
+            <div style={cardStyle}>
+              <Label>Add Info</Label>
+              <p style={{ fontSize:14, lineHeight:1.7, color:"#1A2E4A", marginTop:8 }}>Return to any saved entry to add detail: what set it off, what you were telling yourself, how things played out, and reflections that come to you later. This is where the real insight often happens, sometimes hours or days after the moment itself.</p>
+            </div>
+
+            <div style={cardStyle}>
+              <Label>Insights</Label>
+              <p style={{ fontSize:14, lineHeight:1.7, color:"#1A2E4A", marginTop:8 }}>Once you have a few entries, this tab shows your patterns: which activation levels come up most, which stress response patterns are most common, and what tends to follow which feeling. You can also share a summary, or clear your entries here.</p>
+            </div>
+
+            <div style={cardStyle}>
+              <Label>The SRP Guide</Label>
+              <p style={{ fontSize:14, lineHeight:1.7, color:"#1A2E4A", marginTop:8 }}>A reference for the five Stress Response Patterns this app tracks, what each one means and why it shows up. Worth reading once at the start, and returning to whenever you want a refresher.</p>
+            </div>
+
+            <p style={{ textAlign:"center", color:"#B8A898", fontSize:11, marginTop:24 }}>© 2026 Michael Jursic. All rights reserved.</p>
+          </div>
+        )}
+
+        {tab === "checkin" && (
+          <div style={{ paddingTop:24 }}>
+
+            <div style={cardStyle}>
+              <Label>Date &amp; Time</Label>
+              <div style={{ fontSize:15, color:"#2E4A7A", fontStyle:"italic", marginTop:6 }}>{formatDate(form.datetime)}</div>
+            </div>
+
+            {/* Anger Level */}
+            <div style={cardStyle}>
+              <Label>Activation Level</Label>
+              <div style={{ display:"flex", gap:10, marginTop:10 }}>
+                {ANGER_LEVELS.map(n => {
+                  const active = form.angerLevel === n;
+                  return (
+                    <button key={n} onClick={() => setForm(f => ({ ...f, angerLevel:n }))} style={{
+                      width:48, height:48, borderRadius:"50%",
+                      border: active ? `3px solid ${angerDark(n)}` : `2px solid ${angerColor(n)}88`,
+                      background: active ? angerColor(n) : angerColor(n)+"22",
+                      color: active ? "#fff" : angerDark(n),
+                      fontSize:18, fontWeight:"bold", cursor:"pointer", transition:"all 0.2s",
+                      boxShadow: active ? `0 4px 14px ${angerColor(n)}90` : "none"
+                    }}>{n}</button>
+                  );
+                })}
+              </div>
+              {form.angerLevel > 0 && <div style={{ marginTop:8, fontSize:12, color:"#7A8FA8", fontStyle:"italic" }}>{angerLabel(form.angerLevel)}</div>}
+            </div>
+
+            {/* Rage Type */}
+            <div style={cardStyle}>
+              <Label>Stress Response Pattern <span style={{ fontWeight:"normal", color:"#B8A898" }}>(pick as many as fit)</span></Label>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginTop:12 }}>
+                {RAGE_TYPES.map(r => {
+                  const active = form.rageType.includes(r.value);
+                  return (
+                    <button key={r.value} onClick={() => toggle("rageType", r.value)} style={{
+                      padding:"10px 16px", borderRadius:12, cursor:"pointer",
+                      border: active ? "2.5px solid #2E4A7A" : "1.5px solid #DDD5C4",
+                      background: active ? "#2E4A7A" : "#FDFAF5",
+                      color: active ? "#fff" : "#2E4A7A",
+                      fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+                      boxShadow: active ? "0 2px 8px rgba(46,74,122,0.3)" : "none",
+                      textAlign:"center", minWidth:90
+                    }}>
+                      <div style={{ fontSize:14, fontWeight:"600" }}>{r.label}</div>
+                      <div style={{ fontSize:11, opacity:0.8, marginTop:2, fontStyle:"italic" }}>{r.descriptor}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Feelings */}
+            <div style={cardStyle}>
+              <Label>Feelings</Label>
+              <ToggleButtons items={FEELINGS} selected={form.feelings} onToggle={v => toggle("feelings", v)} />
+            </div>
+
+            {/* How it came out */}
+            <div style={cardStyle}>
+              <Label>What was my response?</Label>
+              <ToggleButtons items={EXPRESSIONS} selected={form.expression} onToggle={v => toggle("expression", v)} />
+            </div>
+
+            {/* Took it out on someone */}
+            <div style={cardStyle}>
+              <button onClick={() => setForm(f => ({ ...f, tookItOut: !f.tookItOut }))} style={{
+                width:"100%", padding:"12px 16px", borderRadius:12,
+                border: form.tookItOut ? "2.5px solid #c03030" : "1.5px solid #c0303088",
+                background: form.tookItOut ? "#c03030" : "#c0303018",
+                color: form.tookItOut ? "#fff" : "#7a0000",
+                fontSize:14, fontWeight: form.tookItOut ? "600" : "normal",
+                cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+                boxShadow: form.tookItOut ? "0 2px 10px rgba(192,48,48,0.35)" : "none"
+              }}>
+                {form.tookItOut ? "✓ My anger landed on someone else" : "My anger landed on someone else"}
+              </button>
+            </div>
+
+            {/* Add Info inline */}
+            <div style={{ marginBottom:14 }}>
+              <button onClick={handleAddDetail} disabled={!canAddDetail} style={{
+                width:"100%", padding:"12px 16px", borderRadius:12,
+                border: (hasRedExpression || form.tookItOut) ? "2px solid #c03030" : canAddDetail ? "1.5px solid #2E4A7A88" : "1.5px solid #DDD5C4",
+                background: (hasRedExpression || form.tookItOut) ? "#c0303022" : canAddDetail ? "#2E4A7A18" : "#F5F0E8",
+                color: (hasRedExpression || form.tookItOut) ? "#7a0000" : canAddDetail ? "#2E4A7A" : "#B8A898",
+                fontSize:14, cursor: canAddDetail ? "pointer" : "not-allowed",
+                fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+                fontWeight: (hasRedExpression || form.tookItOut) ? "600" : "normal",
+                boxShadow: (hasRedExpression || form.tookItOut) ? "0 2px 10px rgba(192,48,48,0.25)" : "none"
+              }}>
+                {(hasRedExpression || form.tookItOut) ? "⚠ Add more detail →" : "Add more detail →"}
+              </button>
+            </div>
+
+            {/* Save */}
+            <button onClick={saveEntry} disabled={!canSave} style={{
+              width:"100%", padding:16, marginTop:4,
+              background: canSave ? "linear-gradient(135deg, #2E4A7A, #1A2E4A)" : "#DDD5C4",
+              color: canSave ? "#fff" : "#7A8FA8",
+              border:"none", borderRadius:12, fontSize:16,
+              fontFamily:"'Inter',sans-serif", cursor: canSave ? "pointer" : "not-allowed",
+              transition:"all 0.3s", boxShadow: canSave ? "0 4px 16px rgba(46,74,122,0.3)" : "none"
+            }}>
+              {saved ? "✓ Saved — you can always come back to this" : "Save Check-in"}
+            </button>
+            {!canSave && <p style={{ textAlign:"center", color:"#B8A898", fontSize:12, marginTop:8 }}>Set an activation level to save</p>}
+          </div>
+        )}
+
+        {/* ── ADD INFO ── */}
+        {tab === "addinfo" && <AddInfo entries={entries} onUpdate={updateEntry} onDelete={deleteEntry} />}
+
+        {/* ── INSIGHTS ── */}
+        {tab === "insights" && <Insights entries={entries} onClearAll={clearAll} />}
+
+        {/* ── UNDERSTANDING ANGER ── */}
+        {tab === "guide" && (
+          <div style={{ paddingTop:24 }}>
+            <h2 style={{ fontWeight:"500", color:"#2E4A7A", fontSize:22, marginBottom:6, textAlign:"center" }}>The SRP Guide</h2>
+            <p style={{ textAlign:"center", color:"#7A8FA8", fontSize:13, marginBottom:16, fontStyle:"italic" }}>Naming the pattern changes how you respond to it.</p>
+            <div style={{ background:"#DDE6F0", borderRadius:14, padding:"14px 18px", marginBottom:24, border:"1px solid #4A6FA530" }}>
+              <div style={{ fontSize:13, fontWeight:"600", color:"#2E4A7A", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.04em" }}>What is an SRP?</div>
+              <p style={{ margin:0, fontSize:13, lineHeight:1.7, color:"#1A2E4A" }}>SRP stands for <strong>Stress Response Pattern</strong>. The characteristic way your nervous system reacts under specific kinds of emotional pressure. Each SRP is involuntary and pre-cognitive: it fires before conscious thought. Understanding your patterns is the first step toward regulating them.</p>
+            </div>
+            {ANGER_EXPLANATIONS.map(({ type, color, summary, text }) => (
+              <div key={type} style={{ background:"#fff", borderRadius:14, marginBottom:16, boxShadow:"0 2px 12px rgba(0,0,0,0.07)", border:`1px solid ${color}30`, overflow:"hidden" }}>
+                <div style={{ background:`linear-gradient(135deg, ${color}20, ${color}08)`, padding:"14px 18px", borderBottom:`2px solid ${color}40` }}>
+                  <h3 style={{ margin:0, color:color, fontSize:16, fontWeight:"bold" }}>{type}</h3>
+                  <div style={{ fontSize:13, color:color, marginTop:6, fontStyle:"italic", opacity:0.85 }}>{summary}</div>
+                </div>
+                <p style={{ margin:0, padding:"14px 18px", fontSize:14, lineHeight:1.7, color:"#1A2E4A" }}>{text}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'calm-am-v1';
+    const ASSETS = [location.href];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
